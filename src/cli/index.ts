@@ -30,7 +30,10 @@ interface CliIo {
   readPackageVersion(): Promise<string>;
 }
 
-export async function runCli(argv: string[], io: CliIo = createDefaultIo()): Promise<number> {
+export async function runCli(
+  argv: string[],
+  io: CliIo = createDefaultIo()
+): Promise<number> {
   try {
     const parsed = await parseArguments(argv, io);
     if (parsed.kind === 'help') {
@@ -48,7 +51,9 @@ export async function runCli(argv: string[], io: CliIo = createDefaultIo()): Pro
 
     if (parsed.options.outputPath) {
       await io.writeFile(parsed.options.outputPath, markdown);
-      io.stderr(`Wrote ${result.files.length} files to ${parsed.options.outputPath}\n`);
+      io.stderr(
+        `Wrote ${result.files.length} files to ${parsed.options.outputPath}\n`
+      );
     } else {
       io.stdout(markdown);
     }
@@ -64,14 +69,16 @@ export async function runCli(argv: string[], io: CliIo = createDefaultIo()): Pro
 async function parseArguments(
   argv: string[],
   io: CliIo
-): Promise<{ kind: 'help' } | { kind: 'version' } | { kind: 'run'; options: FoldOptions }> {
+): Promise<
+  { kind: 'help' } | { kind: 'version' } | { kind: 'run'; options: FoldOptions }
+> {
   const options: FoldOptions = {
     rootPath: io.cwd,
     rootLabel: '.',
     maxBytes: 200_000,
     maxFileBytes: 50_000,
     maxFiles: 200,
-    respectGitignore: true
+    respectGitignore: true,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -97,7 +104,10 @@ async function parseArguments(
         break;
       }
       case '--max-bytes':
-        options.maxBytes = parsePositiveInteger(requireValue(argv, ++index, '--max-bytes'), '--max-bytes');
+        options.maxBytes = parsePositiveInteger(
+          requireValue(argv, ++index, '--max-bytes'),
+          '--max-bytes'
+        );
         break;
       case '--max-file-bytes':
         options.maxFileBytes = parsePositiveInteger(
@@ -106,10 +116,16 @@ async function parseArguments(
         );
         break;
       case '--max-files':
-        options.maxFiles = parsePositiveInteger(requireValue(argv, ++index, '--max-files'), '--max-files');
+        options.maxFiles = parsePositiveInteger(
+          requireValue(argv, ++index, '--max-files'),
+          '--max-files'
+        );
         break;
       case '--max-tokens':
-        options.maxTokens = parsePositiveInteger(requireValue(argv, ++index, '--max-tokens'), '--max-tokens');
+        options.maxTokens = parsePositiveInteger(
+          requireValue(argv, ++index, '--max-tokens'),
+          '--max-tokens'
+        );
         break;
       default:
         throw new Error(`Unknown argument: ${argument}`);
@@ -151,10 +167,13 @@ function createDefaultIo(): CliIo {
       await writeFile(filePath, content, 'utf8');
     },
     async readPackageVersion(): Promise<string> {
-      const packageJson = await readFile(new URL('../../package.json', import.meta.url), 'utf8');
+      const packageJson = await readFile(
+        new URL('../../package.json', import.meta.url),
+        'utf8'
+      );
       const parsed = JSON.parse(packageJson) as { version?: string };
       return parsed.version ?? '0.0.0';
-    }
+    },
   };
 }
 

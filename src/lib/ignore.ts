@@ -8,7 +8,7 @@ const DEFAULT_PATTERNS = [
   'dist/',
   'coverage/',
   'docs/.vitepress/cache/',
-  'docs/.vitepress/dist/'
+  'docs/.vitepress/dist/',
 ];
 
 const SENSITIVE_PATTERNS = [
@@ -29,7 +29,7 @@ const SENSITIVE_PATTERNS = [
   '**/id_rsa',
   '**/id_dsa',
   '**/id_ecdsa',
-  '**/id_ed25519'
+  '**/id_ed25519',
 ];
 
 export interface IgnoreMatcher {
@@ -81,12 +81,15 @@ export async function createIgnoreMatcher(options: {
     },
     isSensitive(relativePath: string): boolean {
       return sensitiveMatcher.ignores(toIgnorePath(relativePath, false));
-    }
+    },
   };
 }
 
 function toIgnorePath(relativePath: string, isDirectory: boolean): string {
-  const normalized = relativePath.split(path.sep).join('/').replace(/^\.\//, '');
+  const normalized = relativePath
+    .split(path.sep)
+    .join('/')
+    .replace(/^\.\//, '');
   return isDirectory && normalized.length > 0 && !normalized.endsWith('/')
     ? `${normalized}/`
     : normalized;

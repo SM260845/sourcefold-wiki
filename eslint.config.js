@@ -4,7 +4,13 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist/', 'docs/.vitepress/dist/', 'docs/.vitepress/cache/', 'coverage/', 'node_modules/']
+    ignores: [
+      'dist/',
+      'docs/.vitepress/dist/',
+      'docs/.vitepress/cache/',
+      'coverage/',
+      'node_modules/',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -14,12 +20,12 @@ export default tseslint.config(
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
     rules: {
-      'no-console': 'off'
-    }
+      'no-console': 'off',
+    },
   },
   {
     files: ['**/*.js'],
@@ -27,8 +33,8 @@ export default tseslint.config(
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
-        ...globals.node
-      }
-    }
+        ...globals.node,
+      },
+    },
   }
 );

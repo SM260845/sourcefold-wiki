@@ -8,7 +8,9 @@ import { copyFixture, removeTempDirectory } from './helpers.js';
 const cleanupTargets: string[] = [];
 
 afterEach(async () => {
-  await Promise.all(cleanupTargets.splice(0).map((target) => removeTempDirectory(target)));
+  await Promise.all(
+    cleanupTargets.splice(0).map((target) => removeTempDirectory(target))
+  );
 });
 
 describe('runCli', () => {
@@ -16,7 +18,9 @@ describe('runCli', () => {
     const fixture = await copyFixture('basic-repo');
     cleanupTargets.push(path.dirname(fixture));
 
-    const outputRoot = await mkdtemp(path.join(os.tmpdir(), 'sourcefold-output-'));
+    const outputRoot = await mkdtemp(
+      path.join(os.tmpdir(), 'sourcefold-output-')
+    );
     cleanupTargets.push(outputRoot);
     const outputPath = path.join(outputRoot, 'bundle.md');
     const stdout: string[] = [];
@@ -32,12 +36,14 @@ describe('runCli', () => {
       },
       async writeFile(filePath: string, content: string): Promise<void> {
         await import('node:fs/promises').then(({ mkdir, writeFile }) =>
-          mkdir(path.dirname(filePath), { recursive: true }).then(() => writeFile(filePath, content, 'utf8'))
+          mkdir(path.dirname(filePath), { recursive: true }).then(() =>
+            writeFile(filePath, content, 'utf8')
+          )
         );
       },
       async readPackageVersion(): Promise<string> {
         return '0.1.0';
-      }
+      },
     });
 
     expect(exitCode).toBe(0);
@@ -64,7 +70,7 @@ describe('runCli', () => {
       },
       async readPackageVersion(): Promise<string> {
         return '0.1.0';
-      }
+      },
     });
 
     expect(exitCode).toBe(0);

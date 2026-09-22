@@ -9,7 +9,7 @@ const LANGUAGE_OVERRIDES: Record<string, string> = {
   '.mts': 'ts',
   '.sh': 'bash',
   '.tsx': 'tsx',
-  '.yml': 'yaml'
+  '.yml': 'yaml',
 };
 
 interface TreeNode {
@@ -41,7 +41,7 @@ export function renderFoldedMarkdown(result: FoldResult): string {
     '```',
     '',
     '## Files',
-    ''
+    '',
   ];
 
   if (result.files.length === 0) {
@@ -74,7 +74,7 @@ function renderFileSection(file: FoldFile): string {
     '',
     `\`\`\`${file.language}`,
     file.content,
-    '\`\`\`'
+    '```',
   ].join('\n');
 }
 
@@ -90,7 +90,9 @@ export function renderTree(paths: string[]): string {
     let current = root;
 
     for (const segment of segments) {
-      const next = current.children.get(segment) ?? { children: new Map<string, TreeNode>() };
+      const next = current.children.get(segment) ?? {
+        children: new Map<string, TreeNode>(),
+      };
       current.children.set(segment, next);
       current = next;
     }
@@ -102,7 +104,9 @@ export function renderTree(paths: string[]): string {
 }
 
 function appendNodeLines(node: TreeNode, depth: number, lines: string[]): void {
-  const entries = [...node.children.entries()].sort(([left], [right]) => left.localeCompare(right));
+  const entries = [...node.children.entries()].sort(([left], [right]) =>
+    left.localeCompare(right)
+  );
 
   for (const [name, child] of entries) {
     const isDirectory = child.children.size > 0;

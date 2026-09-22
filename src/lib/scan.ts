@@ -3,7 +3,12 @@ import path from 'node:path';
 import { estimateTokens, wouldExceedBudget } from './budget.js';
 import { createIgnoreMatcher } from './ignore.js';
 import { detectLanguage, renderTree } from './render.js';
-import type { FoldFile, FoldOptions, FoldResult, SkippedEntry } from './types.js';
+import type {
+  FoldFile,
+  FoldOptions,
+  FoldResult,
+  SkippedEntry,
+} from './types.js';
 
 export async function foldPath(options: FoldOptions): Promise<FoldResult> {
   const rootPath = path.resolve(options.rootPath);
@@ -13,13 +18,17 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
     throw new Error('The selected root must not be a symbolic link.');
   }
 
-  const rootDirectory = rootStats.isDirectory() ? rootPath : path.dirname(rootPath);
-  const rootLabel = options.rootLabel ?? path.relative(process.cwd(), rootPath) || path.basename(rootPath);
+  const rootDirectory = rootStats.isDirectory()
+    ? rootPath
+    : path.dirname(rootPath);
+  const rootLabel =
+    options.rootLabel ??
+    (path.relative(process.cwd(), rootPath) || path.basename(rootPath));
   const outputIgnore = resolveOutputIgnore(rootDirectory, options.outputPath);
   const matcher = await createIgnoreMatcher({
     rootDirectory,
     respectGitignore: options.respectGitignore,
-    extraIgnoredPaths: outputIgnore ? [outputIgnore] : []
+    extraIgnoredPaths: outputIgnore ? [outputIgnore] : [],
   });
 
   const files: FoldFile[] = [];
@@ -39,13 +48,15 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
     rootDirectory,
     rootLabel,
     files,
-    skipped: skipped.sort((left, right) => left.relativePath.localeCompare(right.relativePath)),
+    skipped: skipped.sort((left, right) =>
+      left.relativePath.localeCompare(right.relativePath)
+    ),
     totals: {
       files: files.length,
       bytes: totalBytes,
-      estimatedTokens: totalTokens
+      estimatedTokens: totalTokens,
     },
-    tree: renderTree(files.map((file) => file.relativePath))
+    tree: renderTree(files.map((file) => file.relativePath)),
   };
 
   async function walkDirectory(relativeDirectory: string): Promise<void> {
@@ -54,7 +65,9 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
     entries.sort((left, right) => left.name.localeCompare(right.name));
 
     for (const entry of entries) {
-      const relativePath = relativeDirectory ? `${relativeDirectory}/${entry.name}` : entry.name;
+      const relativePath = relativeDirectory
+        ? `${relativeDirectory}/${entry.name}`
+        : entry.name;
       const absolutePath = path.join(rootDirectory, relativePath);
       const stats = await lstat(absolutePath);
 
@@ -82,7 +95,10 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
     }
   }
 
-  async function inspectFile(relativePath: string, absolutePath: string): Promise<void> {
+  async function inspectFile(
+    relativePath: string,
+    absolutePath: string
+  ): Promise<void> {
     if (matcher.isIgnored(relativePath, false)) {
       skipped.push({ relativePath, reason: 'ignored' });
       return;
@@ -120,7 +136,7 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
         nextBytes: buffer.length,
         nextTokens: estimatedTokens,
         maxBytes: options.maxBytes,
-        maxTokens: options.maxTokens
+        maxTokens: options.maxTokens,
       })
     ) {
       skipped.push({ relativePath, reason: 'budget-exceeded' });
@@ -133,7 +149,7 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
       sizeBytes: buffer.length,
       estimatedTokens,
       language: detectLanguage(relativePath),
-      content
+      content,
     });
     totalBytes += buffer.length;
     totalTokens += estimatedTokens;
@@ -151,7 +167,10 @@ function isBinaryBuffer(buffer: Buffer): boolean {
   return false;
 }
 
-function resolveOutputIgnore(rootDirectory: string, outputPath?: string): string | undefined {
+function resolveOutputIgnore(
+  rootDirectory: string,
+  outputPath?: string
+): string | undefined {
   if (!outputPath) {
     return undefined;
   }
