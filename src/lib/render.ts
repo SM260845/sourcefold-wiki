@@ -66,16 +66,28 @@ export function renderFoldedMarkdown(result: FoldResult): string {
 }
 
 function renderFileSection(file: FoldFile): string {
+  const fence = createCodeFence(file.content);
+
   return [
     `### \`${file.relativePath}\``,
     '',
     `- Size: ${file.sizeBytes} bytes`,
     `- Language: ${file.language}`,
     '',
-    `\`\`\`${file.language}`,
+    `${fence}${file.language}`,
     file.content,
-    '```',
+    fence,
   ].join('\n');
+}
+
+function createCodeFence(content: string): string {
+  const backtickRuns = content.match(/`+/g) ?? [];
+  const longestRun = backtickRuns.reduce(
+    (max, run) => Math.max(max, run.length),
+    0
+  );
+
+  return '`'.repeat(Math.max(3, longestRun + 1));
 }
 
 export function renderTree(paths: string[]): string {

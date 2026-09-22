@@ -41,6 +41,32 @@ describe('foldPath', () => {
     expect(markdown).toContain('```ts');
   });
 
+  it('uses a code fence longer than backtick runs in file content', () => {
+    const markdown = renderFoldedMarkdown({
+      rootDirectory: '/tmp/sourcefold-wiki',
+      rootLabel: 'basic-repo',
+      files: [
+        {
+          absolutePath: '/tmp/sourcefold-wiki/README.md',
+          relativePath: 'README.md',
+          sizeBytes: 24,
+          estimatedTokens: 16,
+          language: 'md',
+          content: 'Before\n```md\ninside\n```\nAfter\n',
+        },
+      ],
+      skipped: [],
+      totals: {
+        files: 1,
+        bytes: 24,
+        estimatedTokens: 16,
+      },
+      tree: 'README.md',
+    });
+
+    expect(markdown).toContain('````md\nBefore\n```md\ninside\n```\nAfter\n\n````');
+  });
+
   it('respects ignore files and sensitive path protection', async () => {
     const fixture = await copyFixture('basic-repo');
     cleanupTargets.push(path.dirname(fixture));
