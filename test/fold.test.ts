@@ -1,7 +1,7 @@
 import { mkdtemp, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { foldPath, renderFoldedMarkdown } from '../src/lib/index.js';
 import { copyFixture, removeTempDirectory } from './helpers.js';
 
@@ -144,24 +144,115 @@ describe('foldPath', () => {
     const transientPath = path.join(fixture, 'transient.txt');
     await writeFile(transientPath, 'remove me\n', 'utf8');
 
-    const resultPromise = foldPath({
-      rootPath: fixture,
-      rootLabel: 'basic-repo',
-      maxBytes: 200_000,
-      maxFileBytes: 50_000,
-      maxFiles: 200,
-      respectGitignore: true,
+    let transientCheckCount = 0;
+    vi.resetModules();
+    vi.doMock('node:fs/promises', async () => {
+      const actual =
+        await vi.importActual<typeof import('node:fs/promises')>(
+          'node:fs/promises'
+        );
+
+      return {
+        ...actual,
+        lstat: async (targetPath: string, ...args: unknown[]) => {
+          if (targetPath === transientPath) {
+            transientCheckCount += 1;
+            if (transientCheckCount === 2) {
+              await actual.rm(transientPath);
+            }
+          }
+
+          return Reflect.apply(actual.lstat, actual, [targetPath, ...args]);
+        },
+      };
     });
 
-    await writeFile(transientPath, 'remove me later\n', 'utf8');
-    await import('node:fs/promises').then(({ rm }) => rm(transientPath));
+    try {
+      const { foldPath: mockedFoldPath } = await import('../src/lib/index.js');
 
-    const result = await resultPromise;
+      const result = await mockedFoldPath({
+        rootPath: fixture,
+        rootLabel: 'basic-repo',
+        maxBytes: 200_000,
+        maxFileBytes: 50_000,
+        maxFiles: 200,
+        respectGitignore: true,
+      });
 
-    expect(result.skipped).toEqual(
-      expect.arrayContaining([
-        { relativePath: 'transient.txt', reason: 'unsupported' },
-      ])
+      expect(result.skipped).toEqual(
+        expect.arrayContaining([
+          { relativePath: 'transient.txt', reason: 'unsupported' },
+        ])
+      );
+    } finally {
+      vi.doUnmock('node:fs/promises');
+      vi.resetModules();
+    }
+  });
+
+  it('skips files that become symlinks before they are read', async () => {
+    const fixture = await copyFixture('basic-repo');
+    const tempRoot = path.dirname(fixture);
+    cleanupTargets.push(tempRoot);
+
+    const externalRoot = await mkdtemp(
+      path.join(os.tmpdir(), 'sourcefold-external-')
     );
+    cleanupTargets.push(externalRoot);
+
+    const swapTargetPath = path.join(fixture, 'swap.txt');
+    const secretPath = path.join(externalRoot, 'secret.txt');
+
+    await writeFile(swapTargetPath, 'inside root\n', 'utf8');
+    await writeFile(secretPath, 'outside root\n', 'utf8');
+
+    let swapCheckCount = 0;
+    vi.resetModules();
+    vi.doMock('node:fs/promises', async () => {
+      const actual =
+        await vi.importActual<typeof import('node:fs/promises')>(
+          'node:fs/promises'
+        );
+
+      return {
+        ...actual,
+        lstat: async (targetPath: string, ...args: unknown[]) => {
+          if (targetPath === swapTargetPath) {
+            swapCheckCount += 1;
+            if (swapCheckCount === 2) {
+              await actual.rm(swapTargetPath);
+              await actual.symlink(secretPath, swapTargetPath);
+            }
+          }
+
+          return Reflect.apply(actual.lstat, actual, [targetPath, ...args]);
+        },
+      };
+    });
+
+    try {
+      const { foldPath: mockedFoldPath } = await import('../src/lib/index.js');
+
+      const result = await mockedFoldPath({
+        rootPath: fixture,
+        rootLabel: 'basic-repo',
+        maxBytes: 200_000,
+        maxFileBytes: 50_000,
+        maxFiles: 200,
+        respectGitignore: true,
+      });
+
+      expect(
+        result.files.find((file) => file.relativePath === 'swap.txt')
+      ).toBeUndefined();
+      expect(result.skipped).toEqual(
+        expect.arrayContaining([
+          { relativePath: 'swap.txt', reason: 'symlink' },
+        ])
+      );
+    } finally {
+      vi.doUnmock('node:fs/promises');
+      vi.resetModules();
+    }
   });
 });

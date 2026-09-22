@@ -119,6 +119,16 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
       return;
     }
 
+    const currentStats = await safeLstat(absolutePath);
+
+    if (!currentStats || !currentStats.isFile()) {
+      skipped.push({
+        relativePath,
+        reason: currentStats?.isSymbolicLink() ? 'symlink' : 'unsupported',
+      });
+      return;
+    }
+
     const buffer = await safeReadFile(absolutePath);
 
     if (!buffer) {
