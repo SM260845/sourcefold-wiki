@@ -7,30 +7,61 @@ Sourcefold Wiki is a public static knowledge base for Sourcefold and a reference
 - Node.js 20 or newer
 - npm 10 or newer
 
-## Quick start
+## Use the CLI
+
+Build the CLI, then fold a repository with the compiled binary:
 
 ```bash
 git clone https://github.com/SM260845/sourcefold-wiki.git
 cd sourcefold-wiki
 npm ci
+npm run build:cli
+node dist/cli/index.js --root . --output /tmp/sourcefold-wiki.md
+```
+
+### Dogfood via `npm pack`
+
+Install a local tarball to exercise the published `sourcefold` binary path before a registry release:
+
+```bash
+npm pack
+npm install -g ./sourcefold-wiki-0.1.0.tgz
+sourcefold --version
+```
+
+### Install from the npm registry (after publish)
+
+This package is **not** published to npm yet (`npm install -g sourcefold-wiki` returns 404). After a registry publish:
+
+```bash
+npm install -g sourcefold-wiki
+sourcefold --version
+```
+
+## Contributor workflow
+
+Clone the repository and run the local toolchain:
+
+```bash
+git clone https://github.com/SM260845/sourcefold-wiki.git
+cd sourcefold-wiki
+npm ci
+npm run lint
+npm test
+npm run format:check
 npm run build
 npm run dev
 ```
 
 Open the local VitePress URL printed by `npm run dev`.
 
-In a separate terminal, fold this repository into one Markdown file:
-
-```bash
-npm run fold -- --root . --output /tmp/sourcefold-wiki.md
-```
-
 ## Available commands
 
 - `npm run dev` — serve the wiki locally
-- `npm run build` — build the CLI and static site
+- `npm run build` — build the CLI and static site (also runs CLI `--help` / `--version` smoke)
 - `npm run build:cli` — compile the CLI to `dist/`
 - `npm run build:docs` — build the VitePress site
+- `npm run smoke:cli` — run `node dist/cli/index.js --help` and `--version`
 - `npm run fold -- --root <path> --output <file>` — fold a directory or file into Markdown
 - `npm test` — run unit tests
 - `npm run lint` — run ESLint

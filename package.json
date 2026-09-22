@@ -32,7 +32,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "smoke:cli": "node dist/cli/index.js --help && node dist/cli/index.js --version",
+    "postbuild": "npm run smoke:cli"
   },
   "keywords": [
     "sourcefold",

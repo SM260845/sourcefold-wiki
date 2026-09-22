@@ -78,6 +78,32 @@ describe('runCli', () => {
     expect(stdout.join('')).toContain('Usage:');
   });
 
+  it('prints version text', async () => {
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+
+    const exitCode = await runCli(['--version'], {
+      cwd: process.cwd(),
+      stdout(message: string): void {
+        stdout.push(message);
+      },
+      stderr(message: string): void {
+        stderr.push(message);
+      },
+      async writeFile(): Promise<void> {
+        throw new Error('not used');
+      },
+      async readPackageVersion(): Promise<string> {
+        return '0.1.0';
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(stderr).toEqual([]);
+    expect(stdout.join('')).toContain('0.1.0');
+  });
+
+
   it('rejects malformed numeric flags', async () => {
     const stdout: string[] = [];
     const stderr: string[] = [];
