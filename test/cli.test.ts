@@ -77,4 +77,29 @@ describe('runCli', () => {
     expect(stderr).toEqual([]);
     expect(stdout.join('')).toContain('Usage:');
   });
+
+  it('rejects malformed numeric flags', async () => {
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+
+    const exitCode = await runCli(['--max-files', '1abc'], {
+      cwd: process.cwd(),
+      stdout(message: string): void {
+        stdout.push(message);
+      },
+      stderr(message: string): void {
+        stderr.push(message);
+      },
+      async writeFile(): Promise<void> {
+        throw new Error('not used');
+      },
+      async readPackageVersion(): Promise<string> {
+        return '0.1.0';
+      },
+    });
+
+    expect(exitCode).toBe(1);
+    expect(stdout).toEqual([]);
+    expect(stderr.join('')).toContain('--max-files must be a positive integer');
+  });
 });

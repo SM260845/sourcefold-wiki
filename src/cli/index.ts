@@ -145,12 +145,11 @@ function requireValue(argv: string[], index: number, flag: string): string {
 }
 
 function parsePositiveInteger(value: string, flag: string): number {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (!/^[1-9]\d*$/.test(value)) {
     throw new Error(`${flag} must be a positive integer`);
   }
 
-  return parsed;
+  return Number(value);
 }
 
 function createDefaultIo(): CliIo {

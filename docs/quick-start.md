@@ -30,6 +30,17 @@ sed -n '1,120p' /tmp/sourcefold-wiki.md
 npm run fold -- --root examples/tiny-repo --output /tmp/tiny-repo.md
 ```
 
+## Explore behavior intentionally
+
+Exercise the main operating modes with short probes:
+
+```bash
+npm run fold -- --root examples/tiny-repo --max-files 1
+npm run fold -- --root examples/tiny-repo/src/index.ts
+```
+
+For a fuller exploration workflow, use [Exploration techniques and use cases](/exploration-techniques-and-use-cases).
+
 ## Validation workflow
 
 Run the full local validation set before opening a pull request:

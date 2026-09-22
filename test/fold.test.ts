@@ -55,7 +55,7 @@ describe('foldPath', () => {
     });
 
     expect(
-      result.files.find((file) => file.relativePath === 'ignored.log')
+      result.files.find((file) => file.relativePath === 'ignored.txt')
     ).toBeUndefined();
     expect(
       result.files.find((file) => file.relativePath === '.env')
@@ -63,7 +63,7 @@ describe('foldPath', () => {
     expect(result.skipped).toEqual(
       expect.arrayContaining([
         { relativePath: '.env', reason: 'sensitive' },
-        { relativePath: 'ignored.log', reason: 'ignored' },
+        { relativePath: 'ignored.txt', reason: 'ignored' },
       ])
     );
   });
@@ -133,6 +133,34 @@ describe('foldPath', () => {
       expect.arrayContaining([
         { relativePath: 'binary.bin', reason: 'binary' },
         { relativePath: 'linked-secret.txt', reason: 'symlink' },
+      ])
+    );
+  });
+
+  it('tolerates files that disappear during a scan', async () => {
+    const fixture = await copyFixture('basic-repo');
+    cleanupTargets.push(path.dirname(fixture));
+
+    const transientPath = path.join(fixture, 'transient.txt');
+    await writeFile(transientPath, 'remove me\n', 'utf8');
+
+    const resultPromise = foldPath({
+      rootPath: fixture,
+      rootLabel: 'basic-repo',
+      maxBytes: 200_000,
+      maxFileBytes: 50_000,
+      maxFiles: 200,
+      respectGitignore: true,
+    });
+
+    await writeFile(transientPath, 'remove me later\n', 'utf8');
+    await import('node:fs/promises').then(({ rm }) => rm(transientPath));
+
+    const result = await resultPromise;
+
+    expect(result.skipped).toEqual(
+      expect.arrayContaining([
+        { relativePath: 'transient.txt', reason: 'unsupported' },
       ])
     );
   });

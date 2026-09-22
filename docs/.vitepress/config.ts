@@ -10,6 +10,7 @@ export default defineConfig({
       { text: 'Quick start', link: '/quick-start' },
       { text: 'Format spec', link: '/format-spec' },
       { text: 'CLI reference', link: '/cli-reference' },
+      { text: 'Techniques', link: '/exploration-techniques-and-use-cases' },
     ],
     sidebar: [
       {
@@ -27,6 +28,10 @@ export default defineConfig({
             link: '/security-and-threat-model',
           },
           { text: 'CLI reference', link: '/cli-reference' },
+          {
+            text: 'Exploration techniques and use cases',
+            link: '/exploration-techniques-and-use-cases',
+          },
           { text: 'Contributing', link: '/contributing' },
         ],
       },

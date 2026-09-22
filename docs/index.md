@@ -17,6 +17,7 @@ Folding produces a single artifact that is easier to move between tools, archive
 - Ignore and inclusion behavior
 - Security boundaries and skip rules
 - CLI flags and local workflows
+- Exploration techniques and established use cases
 - Contribution requirements for docs and code
 
 ## Start here
@@ -24,3 +25,4 @@ Folding produces a single artifact that is easier to move between tools, archive
 1. Follow the [Quick start](/quick-start).
 2. Review the [Format spec](/format-spec).
 3. Validate assumptions with the [CLI reference](/cli-reference).
+4. Apply the [Exploration techniques and use cases](/exploration-techniques-and-use-cases).

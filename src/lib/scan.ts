@@ -69,7 +69,12 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
         ? `${relativeDirectory}/${entry.name}`
         : entry.name;
       const absolutePath = path.join(rootDirectory, relativePath);
-      const stats = await lstat(absolutePath);
+      const stats = await safeLstat(absolutePath);
+
+      if (!stats) {
+        skipped.push({ relativePath, reason: 'unsupported' });
+        continue;
+      }
 
       if (stats.isSymbolicLink()) {
         skipped.push({ relativePath, reason: 'symlink' });
@@ -114,7 +119,12 @@ export async function foldPath(options: FoldOptions): Promise<FoldResult> {
       return;
     }
 
-    const buffer = await readFile(absolutePath);
+    const buffer = await safeReadFile(absolutePath);
+
+    if (!buffer) {
+      skipped.push({ relativePath, reason: 'unsupported' });
+      return;
+    }
 
     if (buffer.length > options.maxFileBytes) {
       skipped.push({ relativePath, reason: 'file-too-large' });
@@ -182,4 +192,32 @@ function resolveOutputIgnore(
   }
 
   return relativeOutput;
+}
+
+async function safeLstat(absolutePath: string) {
+  try {
+    return await lstat(absolutePath);
+  } catch (error) {
+    if (isMissingFileError(error)) {
+      return undefined;
+    }
+
+    throw error;
+  }
+}
+
+async function safeReadFile(absolutePath: string) {
+  try {
+    return await readFile(absolutePath);
+  } catch (error) {
+    if (isMissingFileError(error)) {
+      return undefined;
+    }
+
+    throw error;
+  }
+}
+
+function isMissingFileError(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
