@@ -1,0 +1,8 @@
+{
+  "proposalId": "prop-deny",
+  "agentId": "agent@local",
+  "serverId": "fs",
+  "toolName": "read_file",
+  "arguments": { "path": "/tmp/x" },
+  "requestedAt": "2026-09-23T08:00:00.000Z"
+}

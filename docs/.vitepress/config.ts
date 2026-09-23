@@ -11,6 +11,7 @@ export default defineConfig({
       { text: 'Format spec', link: '/format-spec' },
       { text: 'CLI reference', link: '/cli-reference' },
       { text: 'Techniques', link: '/exploration-techniques-and-use-cases' },
+      { text: 'Capgate', link: '/capgate/' },
     ],
     sidebar: [
       {
@@ -33,6 +34,14 @@ export default defineConfig({
             link: '/exploration-techniques-and-use-cases',
           },
           { text: 'Contributing', link: '/contributing' },
+        ],
+      },
+      {
+        text: 'Capgate',
+        items: [
+          { text: 'Overview', link: '/capgate/' },
+          { text: 'Architecture', link: '/capgate/architecture' },
+          { text: 'Threat model', link: '/capgate/threat-model' },
         ],
       },
     ],
