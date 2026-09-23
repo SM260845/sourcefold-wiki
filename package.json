@@ -9,7 +9,8 @@
     "node": ">=20"
   },
   "bin": {
-    "sourcefold": "./dist/cli/index.js"
+    "sourcefold": "./dist/cli/index.js",
+    "capgate": "./dist/capgate/cli.js"
   },
   "main": "./dist/lib/index.js",
   "files": [
@@ -29,6 +30,7 @@
     "build:docs": "vitepress build docs",
     "preview": "vitepress preview docs",
     "fold": "node dist/cli/index.js",
+    "capgate": "node dist/capgate/cli.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -39,7 +41,10 @@
     "markdown",
     "llm",
     "vitepress",
-    "wiki"
+    "wiki",
+    "capgate",
+    "mcp",
+    "capability-token"
   ],
   "repository": {
     "type": "git",

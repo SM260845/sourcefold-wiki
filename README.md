@@ -41,8 +41,19 @@ npm run fold -- --root . --output /tmp/sourcefold-wiki.md
 - `docs/` — VitePress wiki content
 - `src/cli/` — CLI entry point
 - `src/lib/` — fold engine, ignore rules, rendering, and budgets
+- `src/capgate/` — Capgate research-preview MCP tool gate core
 - `test/` — unit tests and fixture trees
 - `examples/tiny-repo/` — small example used by docs and tests
+- `examples/capgate/` — sample gate contract and deny proposal
+
+## Capgate (research-preview)
+
+Fail-closed capability-token MCP tool gate co-located for architecture review.
+
+- Invariant: agent cannot reach tools except authorize → permit → execute
+- Docs: `/capgate/`, `/capgate/architecture`, `/capgate/threat-model`
+- Tests: `npm test -- test/capgate`
+- Status: **not production**
 
 ## Documentation
 
@@ -53,6 +64,7 @@ Start with these pages after launching the site:
 - `/ignore-and-inclusion-rules`
 - `/security-and-threat-model`
 - `/cli-reference`
+- `/capgate/`
 - `/contributing`
 
 ## License

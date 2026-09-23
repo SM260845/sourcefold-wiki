@@ -1,0 +1,14 @@
+{
+  "contractId": "ctr-fs-demo",
+  "agentIds": ["agent@local"],
+  "maxSteps": 5,
+  "permitTtlSeconds": 60,
+  "allowlist": [
+    {
+      "serverId": "fs",
+      "toolName": "read_file",
+      "audience": "mcp:fs:read_file",
+      "requiredActions": ["read"]
+    }
+  ]
+}
